@@ -23,7 +23,6 @@ function setup () {
       type: 'png',
       minZoom: 0,
       maxZoom: 21,
-      retina: true,
       attribution: [
         'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ',
         'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
