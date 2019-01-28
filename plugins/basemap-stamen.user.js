@@ -31,9 +31,8 @@ function setup () {
       ].join('')
     },
     initialize: function (name, options) {
-      L.setOptions(this, options);
-      this.options.layer = name.replace(' ','-').toLowerCase();
-      L.TileLayer.prototype.initialize.call(this, baseUrl);
+      options.layer = name.replace(' ','-').toLowerCase();
+      L.TileLayer.prototype.initialize.call(this, baseUrl, options);
     }
   });
 
@@ -58,6 +57,7 @@ function setup () {
 
   options = {
     minZoom: 1,
+    maxZoom: 21,
     maxNativeZoom: 18,
     type: 'jpg',
     attribution: [
