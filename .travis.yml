@@ -28,22 +28,33 @@ before_script:
 - chmod 600 /tmp/deploy_rsa
 - eval "$(ssh-agent -s)"
 - ssh-add /tmp/deploy_rsa
-- rm -rf build/local/*
-- rm -rf build/mobile/*
-script:
-- wget https://iitc.modos189.ru/deploy/$TRAVIS_BRANCH/localbuildsettings.py
-- ./build.py $TRAVIS_BRANCH
-- ./build.py mobile
-deploy:
-  provider: releases
-  name: $TRAVIS_TAG
-  api_key:
-    secure: KoJXTxCoatpFbQgbW1VBIh1ndtQIEmj68sANI+zOs54vi9XMCG3RM4cFn4y7YsSI/kz6XcoSC30SNnqedxHMPJyjrIWvVLKDTlbJswZmGhsslrZmClw3sFROKodVI5DoI0520mAfwzQ5PInPpSEfsPZQhA9ufv1wTZ/98q2efcRPu3J6riSdOZmqJ2A+veWpID3t3P57Lcjew+P3PdmUpwC9t6Yp4oQaYX4DZvMMpqK6s8E4EfOVQptaFAxYDIlAIWxNsfIJkx3jwmLdyaSwQL/fyesQ3fZRECKZTN7RM8/2nImuBZsq4uKS3nrKpLEXFTId45ET5N0fa23KXMLMM8NW0LlATLLWju+N7dP2HCeV5w2wxh+ToAR58XciiZLIsxI1IfF8WXloPax6DmJYksEKOenMYB/y/VASi5xbEhl89kdkxAaO6hAoVqKYo+xt7y3nPGSDUf+zfJnno5lPXgF3ctVAjmRBTWUSQQ5VhAeOp2LGg8ennzSkaLKxqyIxJ7F+n7Y0/QmG0uQzmerOjEEjVBsyVawRWjZGrDlog3Pq2S0n4vnbvbtUchwp/Fapjtg1f1pWy9Bzi1tnnE4ALJEmM894izxWH4vtDQu1+nkjKtLrkxgjk5yEuPj3n95ab64UO1To/x4YlyApmLkDeZIEMd+5siBTeGlB1V05Mr4=
-  file_glob: true
-  file:
-  - ./build/mobile/IITC_Mobile-release.apk
-  - ./build/$TRAVIS_BRANCH/*
-  on:
-    repo: IITC-CE/ingress-intel-total-conversion
-    tags: true
-    all_branches: true
+
+jobs:
+  include:
+    - stage: test-build
+      if: branch = test-deploy
+      script:
+      - wget https://iitc.modos189.ru/deploy/test/localbuildsettings.py
+      - ./build.py test
+      - ./build.py mobile
+
+    - stage: release
+      if: branch != test-deploy
+      script:
+      - wget https://iitc.modos189.ru/deploy/release/localbuildsettings.py
+      - ./build.py release
+      - ./build.py mobile
+      deploy:
+        provider: releases
+        name: $TRAVIS_TAG
+        skip_cleanup: true
+        api_key:
+          secure: KoJXTxCoatpFbQgbW1VBIh1ndtQIEmj68sANI+zOs54vi9XMCG3RM4cFn4y7YsSI/kz6XcoSC30SNnqedxHMPJyjrIWvVLKDTlbJswZmGhsslrZmClw3sFROKodVI5DoI0520mAfwzQ5PInPpSEfsPZQhA9ufv1wTZ/98q2efcRPu3J6riSdOZmqJ2A+veWpID3t3P57Lcjew+P3PdmUpwC9t6Yp4oQaYX4DZvMMpqK6s8E4EfOVQptaFAxYDIlAIWxNsfIJkx3jwmLdyaSwQL/fyesQ3fZRECKZTN7RM8/2nImuBZsq4uKS3nrKpLEXFTId45ET5N0fa23KXMLMM8NW0LlATLLWju+N7dP2HCeV5w2wxh+ToAR58XciiZLIsxI1IfF8WXloPax6DmJYksEKOenMYB/y/VASi5xbEhl89kdkxAaO6hAoVqKYo+xt7y3nPGSDUf+zfJnno5lPXgF3ctVAjmRBTWUSQQ5VhAeOp2LGg8ennzSkaLKxqyIxJ7F+n7Y0/QmG0uQzmerOjEEjVBsyVawRWjZGrDlog3Pq2S0n4vnbvbtUchwp/Fapjtg1f1pWy9Bzi1tnnE4ALJEmM894izxWH4vtDQu1+nkjKtLrkxgjk5yEuPj3n95ab64UO1To/x4YlyApmLkDeZIEMd+5siBTeGlB1V05Mr4=
+        file_glob: true
+        file:
+        - ./build/mobile/IITC_Mobile-release.apk
+        - ./build/release/*
+        on:
+          repo: IITC-CE/ingress-intel-total-conversion
+          tags: true
+          all_branches: true
