@@ -41,8 +41,8 @@ before_script:
 
 script:
 - wget https://iitc.modos189.ru/deploy/$BUILD_TYPE/localbuildsettings.py
-- ./build.py $BUILD_TYPE
-- ./build.py mobile
+- "./build.py $BUILD_TYPE"
+- "./build.py mobile"
 
 deploy:
   provider: releases
