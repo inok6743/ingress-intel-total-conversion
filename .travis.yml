@@ -5,7 +5,7 @@ branches:
   - test-builds
   - master
   - test-deploy
-  - /^([0-9]+)\.([0-9]+)\.([0-9]+)$/
+  - /^v([0-9]+)\.([0-9]+).*$/
 android:
   components:
   - platform-tools
@@ -46,3 +46,4 @@ deploy:
   on:
     repo: IITC-CE/ingress-intel-total-conversion
     tags: true
+    all_branches: true
