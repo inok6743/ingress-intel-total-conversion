@@ -176,6 +176,7 @@ window.setupMap = function() {
     bounceAtZoomLimits: false,
     preferCanvas: true // Set to true if Leaflet should draw things using Canvas instead of SVG
   });
+  if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
 
   if (L.Path.CANVAS) {
     // for canvas, 2% overdraw only - to help performance
@@ -635,6 +636,36 @@ window.extendLeaflet = function() {
   L.divIcon.coloredSvg = function (color, options) {
     return new L.DivIcon.ColoredSvg(color, options);
   };
+
+  // use the earth radius value used by the s2 geometry library
+  // this library is used in the ingress backend, so distance calculation, etc
+  // are far closer if we use the value from that
+  var s2EarthRadius = 6367000;
+
+  L.CRC.Earth.R = s2EarthRadius;
+
+  /* !!This block is commented out as it's unclear if we really need this patch
+
+  // See https://github.com/IITC-CE/ingress-intel-total-conversion/pull/78#issuecomment-462323839
+
+  var s2SphericalMercator = Util.extend({}, L.Projection.SphericalMercator, {
+    R: s2EarthRadius,
+    bounds: (function () {
+      var d = s2EarthRadius * Math.PI;
+      return new Bounds([-d, -d], [d, d]);
+    })()
+  });
+
+  L.CRS.S2 = Util.extend({}, L.CRC.Earth, {
+    code: 'EPSG:S2',
+    projection: s2SphericalMercator,
+    transformation: (function () {
+      var scale = 0.5 / (Math.PI * s2SphericalMercator.R);
+      return L.transformation(scale, 0.5, -scale, 0.5);
+    }())
+  });
+
+  */
 
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
